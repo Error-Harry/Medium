@@ -5,6 +5,7 @@
     "deploy": "wrangler deploy --minify"
   },
   "dependencies": {
+    "@error_harry/medium-validation": "^1.0.0",
     "@prisma/client": "^5.20.0",
     "@prisma/extension-accelerate": "^1.2.0",
     "bcrypt-edge": "^0.1.0",
