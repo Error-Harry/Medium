@@ -26,6 +26,17 @@ userRouter.post("/signup", async (c) => {
   }
   const hashedPassword = hashSync(body.password, 8);
   try {
+    const existingUser = await prisma.user.findUnique({
+      where: {
+        email: body.email,
+      },
+    });
+
+    if (existingUser) {
+      c.status(409);
+      return c.json({ error: "User already exists" });
+    }
+
     const user = await prisma.user.create({
       data: {
         email: body.email,
@@ -42,7 +53,7 @@ userRouter.post("/signup", async (c) => {
       201
     );
   } catch (error) {
-    c.status(400);
+    c.status(500);
     return c.json({ error: "Error while signing up" });
   }
 });
