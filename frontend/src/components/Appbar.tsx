@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Avatar } from "./BlogCard";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { jwtDecode } from "jwt-decode";
+import { decodeJwt } from "jose";
 import { FaPlus } from "react-icons/fa";
 
 function Appbar() {
@@ -16,7 +16,8 @@ function Appbar() {
       if (!token) return;
 
       try {
-        const decodedToken = jwtDecode(token) as { id: string };
+        const decodedToken = decodeJwt(token) as { id: string };
+        console.log(decodedToken);
         const userId = decodedToken.id;
 
         const response = await axios.post(
