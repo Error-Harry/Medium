@@ -1,6 +1,7 @@
 import { useState, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
 import { createBlogInput } from "@error_harry/medium-validation";
+import { BACKEND_URL } from "../../config";
 
 function Publish() {
   const [formData, setFormData] = useState({ title: "", content: "" });
@@ -29,7 +30,7 @@ function Publish() {
 
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/v1/blog`,
+        `${BACKEND_URL}/api/v1/blog`,
         formData,
         {
           headers: {

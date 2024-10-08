@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { BlogWithoutId } from "../hooks";
 import { Avatar } from "./BlogCard";
 import axios from "axios";
-
+import { BACKEND_URL } from "../../config";
 function FullBlogCard({
   blog,
   blogId,
@@ -30,7 +30,7 @@ function FullBlogCard({
   const handleUpdate = async () => {
     try {
       await axios.put(
-        `${import.meta.env.VITE_API_URL}/api/v1/blog`,
+        `${BACKEND_URL}/api/v1/blog`,
         {
           id: blogId,
           title: editableTitle,

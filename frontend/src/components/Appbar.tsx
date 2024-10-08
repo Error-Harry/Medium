@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { decodeJwt } from "jose";
 import { FaPlus } from "react-icons/fa";
+import { BACKEND_URL } from "../../config";
 
 function Appbar() {
   const [userName, setUserName] = useState("");
@@ -21,7 +22,7 @@ function Appbar() {
         const userId = decodedToken.id;
 
         const response = await axios.post(
-          `${import.meta.env.VITE_API_URL}/api/v1/user/userinfo`,
+          `${BACKEND_URL}/api/v1/user/userinfo`,
           { id: userId }
         );
 

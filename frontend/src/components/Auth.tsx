@@ -3,6 +3,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { SignupInput, SigninInput } from "@error_harry/medium-validation";
 import axios from "axios";
+import { BACKEND_URL } from "../../config";
 
 function Auth({ type }: { type: "signup" | "signin" }) {
   const navigate = useNavigate();
@@ -52,7 +53,7 @@ function Auth({ type }: { type: "signup" | "signin" }) {
 
       try {
         const response = await axios.post(
-          `${import.meta.env.VITE_API_URL}/api/v1/user/signup`,
+          `${BACKEND_URL}/api/v1/user/signup`,
           signupData
         );
         const jwt = response.data.jwt;
@@ -68,7 +69,7 @@ function Auth({ type }: { type: "signup" | "signin" }) {
     } else {
       try {
         const response = await axios.post(
-          `${import.meta.env.VITE_API_URL}/api/v1/user/signin`,
+          `${BACKEND_URL}/api/v1/user/signin`,
           signinData
         );
         const jwt = response.data.jwt;
