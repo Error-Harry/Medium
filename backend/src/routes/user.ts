@@ -94,3 +94,36 @@ userRouter.post("/signin", async (c) => {
     return c.json({ error: "Error while logging in" });
   }
 });
+
+userRouter.post("/userinfo", async (c) => {
+  const prisma = new PrismaClient({
+    datasourceUrl: c.env.DATABASE_URL,
+  }).$extends(withAccelerate());
+
+  try {
+    const { id } = await c.req.json();
+
+    const user = await prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) {
+      c.status(404);
+      return c.json({ error: "User not found" });
+    }
+
+    return c.json(
+      {
+        msg: "User details retrieved successfully",
+        user: {
+          email: user.email,
+          name: user.name,
+        },
+      },
+      200
+    );
+  } catch (error) {
+    c.status(500);
+    return c.json({ error: "Error while fetching user details" });
+  }
+});

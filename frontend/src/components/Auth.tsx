@@ -8,18 +8,15 @@ function Auth({ type }: { type: "signup" | "signin" }) {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
   const [signupData, setSignupData] = useState<SignupInput>({
     name: "",
     email: "",
     password: "",
   });
-
   const [signinData, setSigninData] = useState<SigninInput>({
     email: "",
     password: "",
   });
-
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -27,15 +24,9 @@ function Auth({ type }: { type: "signup" | "signin" }) {
     setError(null);
     const { value, name } = e.target;
     if (type === "signup") {
-      setSignupData((prevData) => ({
-        ...prevData,
-        [name]: value,
-      }));
+      setSignupData((prevData) => ({ ...prevData, [name]: value }));
     } else {
-      setSigninData((prevData) => ({
-        ...prevData,
-        [name]: value,
-      }));
+      setSigninData((prevData) => ({ ...prevData, [name]: value }));
     }
   };
 
@@ -69,19 +60,10 @@ function Auth({ type }: { type: "signup" | "signin" }) {
         navigate("/blogs");
       } catch (error) {
         if (axios.isAxiosError(error) && error.response) {
-          if (error.response.status === 409) {
-            setError("User already exists");
-          } else if (error.response.status === 411) {
-            setError("Invalid inputs");
-          } else {
-            setError(
-              error.response.data.error || "Signup failed. Please try again."
-            );
-          }
+          handleErrorResponse(error);
         } else {
           setError("Signup failed. Please try again.");
         }
-        console.error(error);
       }
     } else {
       try {
@@ -100,8 +82,17 @@ function Auth({ type }: { type: "signup" | "signin" }) {
         } else {
           setError("Signin failed. Please try again.");
         }
-        console.error(error);
       }
+    }
+  };
+
+  const handleErrorResponse = (error: any) => {
+    if (error.response.status === 409) {
+      setError("User already exists");
+    } else if (error.response.status === 411) {
+      setError("Invalid inputs");
+    } else {
+      setError(error.response.data.error || "Signup failed. Please try again.");
     }
   };
 
@@ -181,10 +172,12 @@ function Auth({ type }: { type: "signup" | "signin" }) {
             </span>
           </div>
         )}
-        {error && <div className="text-red-500 text-center text-sm">{error}</div>}
+        {error && (
+          <div className="text-red-500 text-center text-sm">{error}</div>
+        )}
         <button
           type="submit"
-          className="w-full p-3 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-400 transition duration-200"
+          className="w-full p-3 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-500 transition duration-200"
         >
           {type === "signup" ? "Sign Up" : "Sign In"}
         </button>
@@ -219,7 +212,7 @@ function Input({
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        className="mt-1 block w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+        className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300 transition duration-200"
       />
     </div>
   );

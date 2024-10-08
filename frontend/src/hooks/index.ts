@@ -6,9 +6,13 @@ interface Blog {
   title: string;
   id: string;
   author: {
+    id: string;
     name: string;
   };
 }
+
+export type BlogWithoutId = Omit<Blog, "id">;
+
 export const useBlogs = () => {
   const [loading, setLoading] = useState(true);
   const [blogs, setBlogs] = useState<Blog[]>([]);
@@ -23,10 +27,42 @@ export const useBlogs = () => {
       .then((res) => {
         setBlogs(res.data.blogs);
         setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch blogs:", error);
+        setLoading(false);
       });
   }, []);
+
   return {
     loading,
     blogs,
+  };
+};
+
+export const useBlog = ({ id }: { id: string }) => {
+  const [loading, setLoading] = useState(true);
+  const [blog, setBlog] = useState<BlogWithoutId>();
+
+  useEffect(() => {
+    axios
+      .get(`${import.meta.env.VITE_API_URL}/api/v1/blog/${id}`, {
+        headers: {
+          Authorization: localStorage.getItem("token"),
+        },
+      })
+      .then((res) => {
+        setBlog(res.data.blog);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch blog:", error);
+        setLoading(false);
+      });
+  }, [id]);
+
+  return {
+    loading,
+    blog,
   };
 };

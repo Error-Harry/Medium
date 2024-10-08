@@ -1,45 +1,59 @@
+import { Link } from "react-router-dom";
+
 interface BlogCardProps {
+  id: string;
   authorName: string;
   title: string;
   content: string;
-  publishedDate: string;
 }
 
 interface AvatarProps {
   name: string;
-}
-function BlogCard({
-  authorName,
-  title,
-  content,
-  publishedDate,
-}: BlogCardProps) {
-  return (
-    <div className="bg-white p-6 rounded-lg shadow mb-6">
-      <div className="flex items-start space-x-4">
-        <Avatar name={authorName} />
-        <div className="flex-1">
-          <div className="flex items-center space-x-2 text-sm text-gray-500">
-            <span className="font-semibold text-gray-700">{authorName}</span>
-            <span>· {publishedDate}</span>
-          </div>
-          <h2 className="text-lg font-semibold text-gray-900 mt-1">{title}</h2>
-          <p className="text-gray-700 mt-1">{content}</p>
-        </div>
-      </div>
-      <div className="text-gray-500 text-sm mt-4">Published {"2 min ago"}</div>
-    </div>
-  );
+  onClick?: () => void;
 }
 
-export default BlogCard;
-
-export const Avatar = ({ name }: AvatarProps) => {
+export const Avatar = ({ name, onClick }: AvatarProps) => {
   const avatarInitial = name.charAt(0).toUpperCase();
 
   return (
-    <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 text-gray-700 font-semibold">
+    <div
+      onClick={onClick}
+      className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-300 text-gray-700 font-semibold cursor-pointer shadow-md"
+    >
       {avatarInitial}
     </div>
   );
 };
+
+function BlogCard({ id, authorName, title, content }: BlogCardProps) {
+  const titleLimit = 50;
+  const contentLimit = 200;
+
+  const truncatedTitle =
+    title.length > titleLimit ? `${title.slice(0, titleLimit)}...` : title;
+  const truncatedContent =
+    content.length > contentLimit
+      ? `${content.slice(0, contentLimit)}...`
+      : content;
+
+  return (
+    <Link to={`/blog/${id}`}>
+      <div className="bg-white p-6 rounded-lg shadow-md mb-6 cursor-pointer hover:shadow-lg transition-shadow duration-200">
+        <div className="flex items-start space-x-4">
+          <Avatar name={authorName} />
+          <div className="flex-1">
+            <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <span className="font-semibold text-gray-800">{authorName}</span>
+            </div>
+            <h2 className="text-lg font-bold text-gray-900 mt-2">
+              {truncatedTitle}
+            </h2>
+            <p className="text-gray-700 mt-1">{truncatedContent}</p>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+export default BlogCard;
