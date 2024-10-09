@@ -5,6 +5,8 @@ import Publish from "./pages/Publish";
 import Appbar from "./components/Appbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { Signin, Signup } from "./pages/AuthPage";
+import MyBlogs from "./pages/MyBlogs";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -36,6 +38,14 @@ function Main() {
         <Route
           path="/publish"
           element={<ProtectedRoute element={<Publish />} />}
+        />
+        <Route
+          path="/profile"
+          element={<ProtectedRoute element={<Profile />} />}
+        />
+        <Route
+          path="/my-blogs"
+          element={<ProtectedRoute element={<MyBlogs />} />}
         />
       </Routes>
     </>

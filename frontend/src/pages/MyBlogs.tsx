@@ -1,11 +1,12 @@
-import { useBlogs } from "../hooks";
+import { useBlogs, useToken } from "../hooks";
 import BlogCard from "../components/BlogCard";
 import { Skeleton } from "../components/Skeleton";
 
-function Blogs() {
+function MyBlogs() {
   const { loading, blogs, setRefresh } = useBlogs();
+  const { userId } = useToken();
 
-  const publishedBlogs = blogs.filter((blog) => blog.published);
+  const myblogs = blogs.filter((blog) => blog.author.id === userId);
 
   return (
     <>
@@ -16,9 +17,9 @@ function Blogs() {
           ))}
         </div>
       ) : (
-        <div className="max-w-3xl mx-auto mt-20 space-y-6">
-          {publishedBlogs.length > 0 ? (
-            publishedBlogs.map((blog) => (
+        <div className="max-w-6xl mx-auto mt-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {myblogs.length > 0 ? (
+            myblogs.map((blog) => (
               <BlogCard
                 id={blog.id}
                 key={blog.id}
@@ -26,13 +27,13 @@ function Blogs() {
                 authorEmail={blog.author.email}
                 title={blog.title}
                 content={blog.content}
-                createdAt={blog.createdAt}
                 published={blog.published}
+                createdAt={blog.createdAt}
                 setRefresh={setRefresh}
               />
             ))
           ) : (
-            <div className="text-center text-gray-500 text-2xl font-semibold my-20">
+            <div className="col-span-3 text-center text-gray-500 text-2xl font-semibold my-20">
               No published blogs available.
             </div>
           )}
@@ -42,4 +43,4 @@ function Blogs() {
   );
 }
 
-export default Blogs;
+export default MyBlogs;

@@ -7,6 +7,7 @@ function Publish() {
   const [formData, setFormData] = useState({ title: "", content: "" });
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
+  const [published, setPublished] = useState<boolean>(false);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -15,10 +16,14 @@ function Publish() {
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (
+    e: FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
+    publishStatus: boolean
+  ) => {
     e.preventDefault();
     setErrorMessage("");
     setSuccessMessage("");
+    setPublished(publishStatus);
 
     const validation = createBlogInput.safeParse(formData);
 
@@ -31,7 +36,7 @@ function Publish() {
     try {
       const response = await axios.post(
         `${BACKEND_URL}/api/v1/blog`,
-        formData,
+        { ...formData, published: publishStatus },
         {
           headers: {
             Authorization: localStorage.getItem("token"),
@@ -56,7 +61,10 @@ function Publish() {
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-4">
           Create Blog Post
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form
+          onSubmit={(e) => handleSubmit(e, published)}
+          className="space-y-4"
+        >
           <div>
             <input
               type="text"
@@ -75,16 +83,26 @@ function Publish() {
               onChange={handleChange}
               required
               rows={10}
-              className="text-lg leading-relaxed w-full border border-gray-300 rounded-md p-4 focus:outline-none focus:border-blue-500"
+              className="w-full p-4 rounded-md text-lg leading-relaxed text-gray-700 border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-300 transition duration-200 resize-none"
               placeholder="Your content goes here..."
             />
           </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition"
-          >
-            Publish
-          </button>
+          <div className="flex space-x-4">
+            <button
+              type="button"
+              onClick={(e) => handleSubmit(e, false)}
+              className="w-full bg-gray-500 text-white p-2 rounded-lg hover:bg-gray-600 transition"
+            >
+              Create
+            </button>
+            <button
+              type="button"
+              onClick={(e) => handleSubmit(e, true)}
+              className="w-full bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition"
+            >
+              Create and Publish
+            </button>
+          </div>
         </form>
 
         {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}

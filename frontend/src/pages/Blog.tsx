@@ -1,9 +1,9 @@
 import { useParams } from "react-router-dom";
-import { BlogWithoutId, useBlog } from "../hooks";
+import { Blog as BlogType, useBlog } from "../hooks";
 import FullBlogCard from "../components/FullBlogCard";
 import { SkeletonLoader } from "../components/Skeleton";
 
-function Blog() {
+function BlogPage() {
   const { id } = useParams();
   const { loading, blog } = useBlog({ id: id || "" });
 
@@ -12,10 +12,10 @@ function Blog() {
       {loading ? (
         <SkeletonLoader />
       ) : (
-        <FullBlogCard blog={blog as BlogWithoutId} blogId={id || ""} />
+        <FullBlogCard blog={blog as BlogType} blogId={id || ""} />
       )}
     </>
   );
 }
 
-export default Blog;
+export default BlogPage;

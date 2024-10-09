@@ -197,8 +197,6 @@ userRouter.delete("/auth/delete", async (c) => {
   }).$extends(withAccelerate());
 
   const { id } = await c.req.json();
-  console.log(id);
-
   if (!id) {
     c.status(400);
     return c.json({ error: "User ID is required" });
