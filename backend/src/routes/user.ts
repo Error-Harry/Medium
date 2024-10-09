@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { compareSync, hashSync } from "bcrypt-edge";
 import { sign, verify } from "hono/jwt";
-import { signinInput, signupInput } from "@error_harry/medium-validation";
+import { signinInput, signupInput, updateUserInput } from "@error_harry/medium-validation";
 
 export const userRouter = new Hono<{
   Bindings: {
@@ -149,7 +149,7 @@ userRouter.put("/auth/update", async (c) => {
   }).$extends(withAccelerate());
 
   const body = await c.req.json();
-  const { success } = signupInput.safeParse(body);
+  const { success } = updateUserInput.safeParse(body);
 
   if (!success) {
     c.status(400);

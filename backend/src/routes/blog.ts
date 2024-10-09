@@ -43,6 +43,7 @@ blogRouter.post("/", async (c) => {
       400
     );
   }
+
   const prisma = new PrismaClient({
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate());
@@ -53,6 +54,7 @@ blogRouter.post("/", async (c) => {
         title: body.title,
         content: body.content,
         authorId: authorId,
+        published: body.published ?? false,
       },
     });
     return c.json(
@@ -78,20 +80,27 @@ blogRouter.put("/", async (c) => {
       400
     );
   }
+
   const prisma = new PrismaClient({
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate());
 
   try {
+    const updatedData = {
+      title: body.title,
+      content: body.content,
+      published: body.published,
+    };
+
     const blog = await prisma.post.update({
       where: {
         id: body.id,
       },
-      data: {
-        title: body.title,
-        content: body.content,
-      },
+      data: Object.fromEntries(
+        Object.entries(updatedData).filter(([_, v]) => v !== undefined)
+      ),
     });
+
     return c.json(
       {
         msg: "Blog updated successfully",
@@ -115,6 +124,7 @@ blogRouter.get("/bulk", async (c) => {
         content: true,
         title: true,
         id: true,
+        published: true,
         createdAt: true,
         author: {
           select: {
@@ -151,6 +161,7 @@ blogRouter.get("/:id", async (c) => {
         id: true,
         content: true,
         title: true,
+        published: true,
         createdAt: true,
         author: {
           select: {
@@ -190,6 +201,7 @@ blogRouter.get("/author/:authorId", async (c) => {
         content: true,
         title: true,
         id: true,
+        published: true,
         createdAt: true,
       },
     });
@@ -241,5 +253,40 @@ blogRouter.delete("/:id", async (c) => {
     return c.json({ msg: "Blog deleted successfully" }, 200);
   } catch (error) {
     return c.json({ msg: "Error while deleting post" }, 500);
+  }
+});
+
+blogRouter.put("/publish", async (c) => {
+  const body = await c.req.json();
+  const { id, published } = body;
+
+  if (typeof id !== "string" || typeof published !== "boolean") {
+    return c.json(
+      {
+        msg: "Invalid inputs, id must be a string and published must be a boolean",
+      },
+      400
+    );
+  }
+
+  const prisma = new PrismaClient({
+    datasourceUrl: c.env.DATABASE_URL,
+  }).$extends(withAccelerate());
+
+  try {
+    const blog = await prisma.post.update({
+      where: { id },
+      data: { published },
+    });
+
+    return c.json(
+      {
+        msg: "Published status updated successfully",
+        blog,
+      },
+      200
+    );
+  } catch (error) {
+    return c.json({ msg: "Error while updating published status" }, 404);
   }
 });
