@@ -67,6 +67,8 @@ function Profile() {
       );
       setSuccessMessage("Profile updated successfully!");
       setTimeout(() => setSuccessMessage(""), 2000);
+      setNewPassword("");
+      setConfirmPassword("");
     } catch (error) {
       setError("Failed to update profile. Please try again.");
     }
