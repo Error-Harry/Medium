@@ -3,7 +3,11 @@ import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { compareSync, hashSync } from "bcrypt-edge";
 import { sign, verify } from "hono/jwt";
-import { signinInput, signupInput, updateUserInput } from "@error_harry/medium-validation";
+import {
+  signinInput,
+  signupInput,
+  updateUserInput,
+} from "@error_harry/medium-validation";
 
 export const userRouter = new Hono<{
   Bindings: {
@@ -110,16 +114,22 @@ userRouter.post("/signin", async (c) => {
   }
 });
 
-userRouter.post("/userinfo", async (c) => {
+userRouter.get("/auth/:id", async (c) => {
   const prisma = new PrismaClient({
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate());
+  const id = c.req.param("id");
 
   try {
-    const { id } = await c.req.json();
-
     const user = await prisma.user.findUnique({
       where: { id },
+      select: {
+        email: true,
+        name: true,
+        _count: {
+          select: { posts: true },
+        },
+      },
     });
 
     if (!user) {
@@ -130,10 +140,7 @@ userRouter.post("/userinfo", async (c) => {
     return c.json(
       {
         msg: "User details retrieved successfully",
-        user: {
-          email: user.email,
-          name: user.name,
-        },
+        user: user,
       },
       200
     );
@@ -149,6 +156,7 @@ userRouter.put("/auth/update", async (c) => {
   }).$extends(withAccelerate());
 
   const body = await c.req.json();
+  console.log(body)
   const { success } = updateUserInput.safeParse(body);
 
   if (!success) {

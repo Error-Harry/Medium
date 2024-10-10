@@ -1,11 +1,27 @@
 import { useBlogs } from "../hooks";
 import BlogCard from "../components/BlogCard";
 import { Skeleton } from "../components/Skeleton";
+import { useSearch } from "../context/SearchContext";
+import Pagination from "../components/Pagination";
+import { useState } from "react";
 
 function Blogs() {
   const { loading, blogs, setRefresh } = useBlogs();
+  const [currentPage, setCurrentPage] = useState(1);
+  const blogsPerPage = 5;
+  const { searchQuery } = useSearch();
 
-  const publishedBlogs = blogs.filter((blog) => blog.published);
+  const filteredBlogs = blogs.filter(
+    (blog) =>
+      blog.published &&
+      blog.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredBlogs.length / blogsPerPage);
+  const paginatedBlogs = filteredBlogs.slice(
+    (currentPage - 1) * blogsPerPage,
+    currentPage * blogsPerPage
+  );
 
   return (
     <>
@@ -17,8 +33,8 @@ function Blogs() {
         </div>
       ) : (
         <div className="max-w-3xl mx-auto mt-20 space-y-6">
-          {publishedBlogs.length > 0 ? (
-            publishedBlogs.map((blog) => (
+          {paginatedBlogs.length > 0 ? (
+            paginatedBlogs.map((blog) => (
               <BlogCard
                 id={blog.id}
                 key={blog.id}
@@ -37,6 +53,13 @@ function Blogs() {
             </div>
           )}
         </div>
+      )}
+      {paginatedBlogs.length > 0 && (
+        <Pagination
+          totalPages={totalPages}
+          currentPage={currentPage}
+          onPageChange={(page) => setCurrentPage(page)}
+        />
       )}
     </>
   );

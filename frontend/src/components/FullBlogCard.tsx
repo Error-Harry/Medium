@@ -46,13 +46,13 @@ function FullBlogCard({ blog, blogId }: { blog: Blog; blogId: string }) {
       setSuccessMessage("Blog updated successfully!");
       setTimeout(() => {
         setSuccessMessage("");
-      }, 3000);
+      }, 2000);
     } catch (error) {
       console.error("Error updating blog:", error);
       setSuccessMessage("Failed to update the blog.");
       setTimeout(() => {
         setSuccessMessage("");
-      }, 3000);
+      }, 2000);
     }
   };
 
@@ -80,13 +80,13 @@ function FullBlogCard({ blog, blogId }: { blog: Blog; blogId: string }) {
       setTimeout(() => {
         navigate("/");
       }, 500);
+      setShowConfirmDelete(false);
     } catch (error) {
       console.error("Error deleting blog:", error);
       setSuccessMessage("Failed to delete the blog.");
       setTimeout(() => {
         setSuccessMessage("");
-      }, 3000);
-    } finally {
+      }, 2000);
       setShowConfirmDelete(false);
     }
   };
@@ -118,7 +118,7 @@ function FullBlogCard({ blog, blogId }: { blog: Blog; blogId: string }) {
       );
       setTimeout(() => {
         setSuccessMessage("");
-      }, 3000);
+      }, 2000);
     }
   };
 

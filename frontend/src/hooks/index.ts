@@ -19,6 +19,14 @@ interface DecodedToken {
   id: string;
 }
 
+export interface UserDetails {
+  email: string;
+  name: string | null;
+  _count: {
+    posts: number;
+  };
+}
+
 export const useBlogs = () => {
   const [loading, setLoading] = useState(true);
   const [blogs, setBlogs] = useState<Blog[]>([]);
@@ -97,4 +105,39 @@ export const useToken = () => {
   }, []);
 
   return { token, userId };
+};
+
+export const useUserDetails = ({ id }: { id: string }) => {
+  const [loading, setLoading] = useState(true);
+  const [userDetails, setUserDetails] = useState<UserDetails | undefined>(
+    undefined
+  );
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get(`${BACKEND_URL}/api/v1/user/auth/${id}`, {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        });
+
+        setUserDetails(res.data.user);
+        setLoading(false);
+      } catch (error) {
+        console.error("Failed to fetch user details:", error);
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchUserDetails();
+    }
+  }, [id]);
+
+  return {
+    loading,
+    userDetails,
+  };
 };

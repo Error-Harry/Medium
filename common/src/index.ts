@@ -25,8 +25,8 @@ export const updateBlogInput = z.object({
 });
 
 export const updateUserInput = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
+  email: z.string().email().optional(),
+  password: z.string().min(6).optional(),
   name: z.string().optional(),
 });
 

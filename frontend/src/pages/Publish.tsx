@@ -49,7 +49,7 @@ function Publish() {
 
       setTimeout(() => {
         setSuccessMessage("");
-      }, 3000);
+      }, 2000);
     } catch (error: any) {
       setErrorMessage(error.response?.data?.msg || "Error creating blog post");
     }

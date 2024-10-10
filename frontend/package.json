@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@error_harry/medium-validation": "^1.0.2",
+    "@error_harry/medium-validation": "^1.0.3",
     "axios": "^1.7.7",
     "jose": "^5.9.3",
     "react": "^18.3.1",

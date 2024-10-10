@@ -152,7 +152,7 @@ function BlogCard({
       )}
       {showConfirmDelete && (
         <div
-          ref={confirmationRef} // Attach ref to the confirmation dialog
+          ref={confirmationRef}
           className="absolute bg-white border border-gray-300 rounded-lg shadow-lg p-4 mt-48"
         >
           <p>Are you sure you want to delete this blog?</p>

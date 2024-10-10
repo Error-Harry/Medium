@@ -1,47 +1,33 @@
 import { useEffect, useRef, useState } from "react";
 import { Avatar } from "./BlogCard";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useNavigate, useLocation } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
-import { BACKEND_URL } from "../../config";
 import { useToken } from "../hooks";
+import { useSearch } from "../context/SearchContext";
+import { useUserDetails } from "../hooks";
 
 function Appbar() {
-  const [userName, setUserName] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { searchQuery, setSearchQuery } = useSearch();
   const { userId } = useToken();
   const navigate = useNavigate();
+  const location = useLocation();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await axios.post(
-          `${BACKEND_URL}/api/v1/user/userinfo`,
-          { id: userId }
-        );
+  const { userDetails } = useUserDetails({ id: userId || "" });
+  const userName = userDetails?.name || "";
 
-        if (response.data.user) {
-          setUserName(response.data.user.name);
-        }
-      } catch (error) {
-        console.error("Error fetching user details:", error);
-      }
-    };
-
-    fetchUser();
-  }, [userId]);
+  const isSearchVisible = ["/blogs", "/", "/my-blogs"].includes(
+    location.pathname
+  );
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    setUserName("");
     navigate("/signin");
     setIsDropdownOpen(false);
   };
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen((prev) => !prev);
-  };
+  const toggleDropdown = () => setIsDropdownOpen((prev) => !prev);
 
   const closeDropdown = (e: MouseEvent) => {
     if (
@@ -71,8 +57,19 @@ function Appbar() {
           onClick={() => navigate("/blogs")}
           className="cursor-pointer text-2xl font-semibold text-white hover:text-blue-200 transition duration-200"
         >
-          Medium | Blog App
+          Blog App
         </div>
+
+        {isSearchVisible && (
+          <input
+            type="text"
+            placeholder="Search by title..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="search-input px-4 py-2 bg-white text-gray-800 placeholder-gray-500 rounded-full shadow-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-200 w-72"
+          />
+        )}
+
         <div className="flex items-center space-x-6">
           <button
             onClick={() => handleNavigation("/publish")}

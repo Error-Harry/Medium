@@ -1,12 +1,28 @@
 import { useBlogs, useToken } from "../hooks";
 import BlogCard from "../components/BlogCard";
 import { Skeleton } from "../components/Skeleton";
+import { useSearch } from "../context/SearchContext";
+import { useState } from "react";
+import Pagination from "../components/Pagination";
 
 function MyBlogs() {
   const { loading, blogs, setRefresh } = useBlogs();
   const { userId } = useToken();
+  const { searchQuery } = useSearch();
+  const [currentPage, setCurrentPage] = useState(1);
+  const blogsPerPage = 9;
 
-  const myblogs = blogs.filter((blog) => blog.author.id === userId);
+  const myblogs = blogs.filter(
+    (blog) =>
+      blog.author.id === userId &&
+      blog.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(myblogs.length / blogsPerPage);
+  const paginatedMyBlogs = myblogs.slice(
+    (currentPage - 1) * blogsPerPage,
+    currentPage * blogsPerPage
+  );
 
   return (
     <>
@@ -18,8 +34,8 @@ function MyBlogs() {
         </div>
       ) : (
         <div className="max-w-6xl mx-auto mt-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {myblogs.length > 0 ? (
-            myblogs.map((blog) => (
+          {paginatedMyBlogs.length > 0 ? (
+            paginatedMyBlogs.map((blog) => (
               <BlogCard
                 id={blog.id}
                 key={blog.id}
@@ -38,6 +54,13 @@ function MyBlogs() {
             </div>
           )}
         </div>
+      )}
+      {paginatedMyBlogs.length > 0 && (
+        <Pagination
+          totalPages={totalPages}
+          currentPage={currentPage}
+          onPageChange={(page) => setCurrentPage(page)}
+        />
       )}
     </>
   );
