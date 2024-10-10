@@ -60,15 +60,6 @@ function FullBlogCard({ blog, blogId }: { blog: Blog; blogId: string }) {
     handleUpdate();
   };
 
-  const handleKeyDown = (
-    e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>
-  ) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleUpdate();
-    }
-  };
-
   const handleDelete = async () => {
     try {
       await axios.delete(`${BACKEND_URL}/api/v1/blog/${blogId}`, {
