@@ -135,7 +135,6 @@ function FullBlogCard({ blog, blogId }: { blog: Blog; blogId: string }) {
               value={editableTitle}
               onChange={handleTitleChange}
               onBlur={handleBlur}
-              onKeyDown={handleKeyDown}
               className="text-4xl font-bold text-center text-gray-900 mb-4 w-full focus:outline-none focus:border-blue-500"
               placeholder="Title goes here"
             />
@@ -143,7 +142,6 @@ function FullBlogCard({ blog, blogId }: { blog: Blog; blogId: string }) {
               value={editableContent}
               onChange={handleContentChange}
               onBlur={handleBlur}
-              onKeyDown={handleKeyDown}
               rows={12}
               className={`w-full p-4 rounded-md text-lg leading-relaxed text-gray-700 border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-300 transition duration-200 resize-none ${contentClass}`}
               placeholder="Your content goes here..."
