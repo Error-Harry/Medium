@@ -122,6 +122,9 @@ function FullBlogCard({ blog, blogId }: { blog: Blog; blogId: string }) {
     }
   };
 
+  const contentClass =
+    editableContent.length > 300 ? "overflow-auto max-h-80 hideScroll" : "";
+
   return (
     <div className="flex flex-col justify-center items-center min-h-screen p-6">
       <div className="w-full max-w-2xl p-6 bg-white shadow-lg rounded-lg border border-gray-200">
@@ -142,7 +145,7 @@ function FullBlogCard({ blog, blogId }: { blog: Blog; blogId: string }) {
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}
               rows={12}
-              className="w-full p-4 rounded-md text-lg leading-relaxed text-gray-700 border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-300 transition duration-200 resize-none"
+              className={`w-full p-4 rounded-md text-lg leading-relaxed text-gray-700 border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-300 transition duration-200 resize-none ${contentClass}`}
               placeholder="Your content goes here..."
             />
           </>
@@ -151,9 +154,11 @@ function FullBlogCard({ blog, blogId }: { blog: Blog; blogId: string }) {
             <h2 className="text-4xl font-bold text-center text-gray-900 mb-4">
               {blog?.title}
             </h2>
-            <p className="text-lg leading-relaxed text-gray-700 border-t border-gray-300 mt-5">
-              {blog?.content}
-            </p>
+            <div className={`border-t border-gray-300 mt-5 ${contentClass}`}>
+              <p className="text-lg leading-relaxed text-gray-700 p-4">
+                {blog?.content}
+              </p>
+            </div>
           </div>
         )}
         <div className="relative flex space-x-8">

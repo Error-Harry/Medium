@@ -6,6 +6,6 @@ body {
   background-color: #f9fafb;
 }
 
-textarea {
+textarea, .hideScroll {
   scrollbar-width: none;
 }
