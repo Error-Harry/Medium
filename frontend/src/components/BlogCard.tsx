@@ -78,6 +78,7 @@ function BlogCard({
   };
 
   const handlePublish = async () => {
+    console.log("publish clicked", id, published)
     try {
       await axios.put(
         `${BACKEND_URL}/api/v1/blog/publish`,

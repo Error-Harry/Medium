@@ -95,6 +95,7 @@ blogRouter.put("/", async (c) => {
     const blog = await prisma.post.update({
       where: {
         id: body.id,
+        archived: false,
       },
       data: Object.fromEntries(
         Object.entries(updatedData).filter(([_, v]) => v !== undefined)
@@ -120,6 +121,9 @@ blogRouter.get("/bulk", async (c) => {
 
   try {
     const blogs = await prisma.post.findMany({
+      where: {
+        archived: false,
+      },
       select: {
         content: true,
         title: true,
@@ -157,6 +161,7 @@ blogRouter.get("/:id", async (c) => {
     const blog = await prisma.post.findFirst({
       where: {
         id: id,
+        archived: false,
       },
       select: {
         id: true,
@@ -198,6 +203,7 @@ blogRouter.get("/author/:authorId", async (c) => {
     const blogs = await prisma.post.findMany({
       where: {
         authorId: authorId,
+        archived: false,
       },
       select: {
         content: true,
@@ -224,44 +230,9 @@ blogRouter.get("/author/:authorId", async (c) => {
   }
 });
 
-blogRouter.delete("/:id", async (c) => {
-  const id = c.req.param("id");
-  const authorId = c.get("userId");
-  const prisma = new PrismaClient({
-    datasourceUrl: c.env.DATABASE_URL,
-  }).$extends(withAccelerate());
-
-  try {
-    const blog = await prisma.post.findUnique({
-      where: {
-        id: id,
-      },
-    });
-
-    if (!blog) {
-      return c.json({ msg: "Blog not found" }, 404);
-    }
-
-    if (blog.authorId !== authorId) {
-      return c.json({ msg: "Unauthorized to delete this blog" }, 403);
-    }
-
-    await prisma.post.delete({
-      where: {
-        id: id,
-      },
-    });
-
-    return c.json({ msg: "Blog deleted successfully" }, 200);
-  } catch (error) {
-    return c.json({ msg: "Error while deleting post" }, 500);
-  }
-});
-
 blogRouter.put("/publish", async (c) => {
   const body = await c.req.json();
   const { id, published } = body;
-
   if (typeof id !== "string" || typeof published !== "boolean") {
     return c.json(
       {
@@ -277,10 +248,9 @@ blogRouter.put("/publish", async (c) => {
 
   try {
     const blog = await prisma.post.update({
-      where: { id },
+      where: { id, archived: false },
       data: { published },
     });
-
     return c.json(
       {
         msg: "Published status updated successfully",
@@ -290,5 +260,45 @@ blogRouter.put("/publish", async (c) => {
     );
   } catch (error) {
     return c.json({ msg: "Error while updating published status" }, 404);
+  }
+});
+
+blogRouter.delete("/:id", async (c) => {
+  const id = c.req.param("id");
+  const authorId = c.get("userId");
+  const prisma = new PrismaClient({
+    datasourceUrl: c.env.DATABASE_URL,
+  }).$extends(withAccelerate());
+
+  try {
+    const blog = await prisma.post.findUnique({
+      where: {
+        id: id,
+        archived: false,
+      },
+    });
+
+    if (!blog) {
+      return c.json({ msg: "Blog not found" }, 404);
+    }
+
+    if (blog.authorId !== authorId) {
+      return c.json({ msg: "Unauthorized to delete this blog" }, 403);
+    }
+
+    await prisma.post.update({
+      where: {
+        id: id,
+        archived: false,
+      },
+      data: {
+        archived: true,
+        published: blog.published ? false : blog.published,
+      },
+    });
+
+    return c.json({ msg: "Blog deleted successfully" }, 200);
+  } catch (error) {
+    return c.json({ msg: "Error while deleting post" }, 500);
   }
 });

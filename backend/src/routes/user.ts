@@ -45,9 +45,10 @@ userRouter.post("/signup", async (c) => {
   }
   const hashedPassword = hashSync(body.password, 8);
   try {
-    const existingUser = await prisma.user.findUnique({
+    const existingUser = await prisma.user.findFirst({
       where: {
         email: body.email,
+        archived: false,
       },
     });
 
@@ -90,9 +91,10 @@ userRouter.post("/signin", async (c) => {
     });
   }
   try {
-    const user = await prisma.user.findUnique({
+    const user = await prisma.user.findFirst({
       where: {
         email: body.email,
+        archived: false,
       },
     });
 
@@ -122,12 +124,16 @@ userRouter.get("/auth/:id", async (c) => {
 
   try {
     const user = await prisma.user.findUnique({
-      where: { id },
+      where: { id, archived: false },
       select: {
         email: true,
         name: true,
         _count: {
-          select: { posts: true },
+          select: {
+            posts: {
+              where: { archived: false },
+            },
+          },
         },
       },
     });
@@ -156,7 +162,6 @@ userRouter.put("/auth/update", async (c) => {
   }).$extends(withAccelerate());
 
   const body = await c.req.json();
-  console.log(body)
   const { success } = updateUserInput.safeParse(body);
 
   if (!success) {
@@ -166,7 +171,7 @@ userRouter.put("/auth/update", async (c) => {
 
   try {
     const user = await prisma.user.findUnique({
-      where: { id: body.id },
+      where: { id: body.id, archived: false },
     });
 
     if (!user) {
@@ -175,7 +180,7 @@ userRouter.put("/auth/update", async (c) => {
     }
 
     const updatedUser = await prisma.user.update({
-      where: { id: body.id },
+      where: { id: body.id, archived: false },
       data: {
         ...(body.name && { name: body.name }),
         ...(body.email && { email: body.email }),
@@ -211,18 +216,27 @@ userRouter.delete("/auth/delete", async (c) => {
   }
 
   try {
-    const deleteResponse = await prisma.$transaction([
-      prisma.post.deleteMany({ where: { authorId: id } }),
-      prisma.user.delete({ where: { id: id } }),
+    const updateResponse = await prisma.$transaction([
+      prisma.post.updateMany({
+        where: { authorId: id, archived: false },
+        data: {
+          archived: true,
+          published: false,
+        },
+      }),
+      prisma.user.update({
+        where: { id: id, archived: false },
+        data: { archived: true },
+      }),
     ]);
 
-    if (deleteResponse) {
+    if (updateResponse) {
       return c.json({ msg: "User and their posts deleted successfully" }, 200);
     }
     await prisma.$disconnect();
   } catch (error) {
     await prisma.$disconnect();
-    console.error("Delete user error:", error);
+    console.error("Archive user error:", error);
     return c.json({ error: "Error while deleting user" }, 500);
   }
 });
